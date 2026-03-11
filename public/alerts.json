@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "a1",
+    "type": "warning",
+    "message": "Explosión de interés en la marca OMODA en Valladolid (+150%)",
+    "date": "Hace 2 horas"
+  },
+  {
+    "id": "a2",
+    "type": "success",
+    "message": "Nueva keyword de baja dificultad detectada: Taller Jaecoo",
+    "date": "Hoy"
+  }
+]
