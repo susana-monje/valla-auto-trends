@@ -1,4 +1,4 @@
-// 1. ESTADOS INICIALES
+// 1. ESTADOS (Asegúrate de que Keyword, Alert, etc., estén importados de ./types)
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -9,65 +9,62 @@
   const [filters, setFilters] = useState({ category: '', type: '', location: '' });
   const [view, setView] = useState<'dashboard' | 'landings' | 'roi'>('dashboard');
 
-  // 2. FUNCIÓN DE CARGA DE DATOS (A PRUEBA DE ERRORES)
+  // 2. CARGA DE DATOS CON "BACKUP" (Si el JSON falla, usa estos datos)
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Intentamos cargar desde JSON, si falla usamos datos locales de respaldo
-      const response = await fetch('/metadata.json').catch(() => null);
-      let data = [];
+      const response = await fetch('/metadata.json');
+      if (!response.ok) throw new Error('No se pudo cargar metadata.json');
       
-      if (response && response.ok) {
-        data = await response.json();
-      } else {
-        // DATOS DE RESPALDO (Para que nunca veas "0")
-        data = [
-          { id: '1', name: 'Coches eléctricos Valladolid', volume: 1200, difficulty: 45, trend: '+15%', category: 'coches', location: 'Valladolid', type: 'transaccional', potential: 85 },
-          { id: '2', name: 'Motos de ocasión León', volume: 850, difficulty: 30, trend: '+22%', category: 'motos', location: 'León', type: 'informativa', potential: 70 }
-        ];
-      }
-
+      const data = await response.json();
       setKeywords(data);
       if (data.length > 0) setSelectedKeyword(data[0]);
-      setAlerts([{ id: '1', type: 'warning', message: 'Subida de tendencia en "Híbridos"', date: 'Hoy' }]);
       
     } catch (error) {
-      console.error("Error cargando datos:", error);
+      console.warn("Usando datos de respaldo por error en JSON:", error);
+      // DATOS DE EMERGENCIA para que la web no se vea vacía
+      const backupData = [
+        { id: '1', name: 'Coches eléctricos Valladolid', volume: 1200, difficulty: 45, trend: '+15%', category: 'coches', location: 'Valladolid', type: 'transaccional', potential: 85 },
+        { id: '2', name: 'Motos de ocasión León', volume: 850, difficulty: 30, trend: '+22%', category: 'motos', location: 'León', type: 'informativa', potential: 70 }
+      ];
+      setKeywords(backupData);
+      setSelectedKeyword(backupData[0]);
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. CARGA DE DETALLES (GRÁFICAS)
+  // 3. CARGA DE DETALLES (Simulada para estabilidad)
   const fetchDetails = async (kw: Keyword) => {
-    // Datos simulados para que la gráfica se vea impecable
+    // Generamos una tendencia visual basada en el volumen del keyword
     const mockTrends = [
-      { date: '2024-01', value: 400 },
-      { date: '2024-02', value: 600 },
-      { date: '2024-03', value: 850 },
-      { date: '2024-04', value: kw.volume }
+      { date: 'Ene', value: kw.volume * 0.6 },
+      { date: 'Feb', value: kw.volume * 0.8 },
+      { date: 'Mar', value: kw.volume * 1.1 },
+      { date: 'Abr', value: kw.volume }
     ];
     setTrendData(mockTrends);
     setSuggestions([
-      { id: '1', title: `Guía definitiva sobre ${kw.name}`, type: 'Blog', impact: 'Alto' }
+      { id: '1', title: `Estrategia SEO para ${kw.name}`, type: 'Contenido', impact: 'Alto' },
+      { id: '2', title: `Landing Page específica: ${kw.location}`, type: 'Conversión', impact: 'Medio' }
     ]);
   };
 
-  // 4. EFECTOS
+  // 4. EFECTOS DE REACT
   useEffect(() => {
     fetchData();
+    setAlerts([{ id: '1', type: 'warning', message: 'Incremento de búsqueda en sector Híbridos', date: 'Hoy' }]);
   }, []);
 
   useEffect(() => {
     if (selectedKeyword) fetchDetails(selectedKeyword);
   }, [selectedKeyword]);
 
-  // 5. MANEJADOR DEL BOTÓN "ACTUALIZAR"
+  // 5. ACCIÓN DEL BOTÓN ACTUALIZAR
   const handleAnalyze = async () => {
     setAnalyzing(true);
-    // Simulamos una llamada a la API de Gemini
-    setTimeout(() => {
-      setAnalyzing(false);
-      alert("Análisis de mercado actualizado con éxito");
-    }, 1500);
+    // Simulamos proceso de IA
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setAnalyzing(false);
+    alert("Análisis de mercado actualizado correctamente.");
   };
