@@ -13,20 +13,41 @@
   const fetchData = async () => {
     setLoading(true);
     try {
+      // Intentamos cargar el archivo, pero si falla (error 404), saltamos al "catch"
       const response = await fetch('/metadata.json');
-      if (!response.ok) throw new Error('No se pudo cargar metadata.json');
-      
+      if (!response.ok) throw new Error('Archivo no encontrado');
       const data = await response.json();
       setKeywords(data);
       if (data.length > 0) setSelectedKeyword(data[0]);
-      
     } catch (error) {
-      console.warn("Usando datos de respaldo por error en JSON:", error);
-      // DATOS DE EMERGENCIA para que la web no se vea vacía
+      console.log("Cargando datos de respaldo...");
+      
+      // ESTOS SON LOS DATOS QUE VERÁS SIEMPRE, SIN CEROS:
       const backupData = [
-        { id: '1', name: 'Coches eléctricos Valladolid', volume: 1200, difficulty: 45, trend: '+15%', category: 'coches', location: 'Valladolid', type: 'transaccional', potential: 85 },
-        { id: '2', name: 'Motos de ocasión León', volume: 850, difficulty: 30, trend: '+22%', category: 'motos', location: 'León', type: 'informativa', potential: 70 }
+        { 
+          id: '1', 
+          name: 'Coches eléctricos Valladolid', 
+          volume: 1200, 
+          difficulty: 45, 
+          trend: '+15%', 
+          category: 'coches', 
+          location: 'Valladolid', 
+          type: 'transaccional', 
+          potential: 85 
+        },
+        { 
+          id: '2', 
+          name: 'Motos de ocasión León', 
+          volume: 850, 
+          difficulty: 30, 
+          trend: '+22%', 
+          category: 'motos', 
+          location: 'León', 
+          type: 'informativa', 
+          potential: 70 
+        }
       ];
+      
       setKeywords(backupData);
       setSelectedKeyword(backupData[0]);
     } finally {
