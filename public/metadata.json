@@ -1,7 +1,112 @@
-{
-  "name": "VallaAuto Trends Pro - SEO Intelligence",
-  "description": "Plataforma avanzada de detección de tendencias y generación automática de landings SEO para el sector automotriz en Valladolid.",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
-}
+[
+  {
+    "id": "1",
+    "name": "coches eléctricos valladolid",
+    "volume": 1200,
+    "difficulty": 45,
+    "trend": "+18%",
+    "category": "eléctricos",
+    "location": "Valladolid",
+    "type": "transaccional",
+    "potential": 92
+  },
+  {
+    "id": "2",
+    "name": "motos ocasión león",
+    "volume": 850,
+    "difficulty": 32,
+    "trend": "+12%",
+    "category": "motos",
+    "location": "León",
+    "type": "comercial",
+    "potential": 78
+  },
+  {
+    "id": "3",
+    "name": "concesionario oficial omoda valladolid",
+    "volume": 2400,
+    "difficulty": 25,
+    "trend": "+150%",
+    "category": "marcas",
+    "location": "Valladolid",
+    "type": "navegacional",
+    "potential": 95
+  },
+  {
+    "id": "4",
+    "name": "mejores suv híbridos 2026",
+    "volume": 3200,
+    "difficulty": 65,
+    "trend": "+25%",
+    "category": "híbridos",
+    "location": "Castilla y León",
+    "type": "informativa",
+    "potential": 60
+  },
+  {
+    "id": "5",
+    "name": "ofertas renting particulares valladolid",
+    "volume": 950,
+    "difficulty": 55,
+    "trend": "+8%",
+    "category": "renting",
+    "location": "Valladolid",
+    "type": "transaccional",
+    "potential": 88
+  },
+  {
+    "id": "6",
+    "name": "taller especializado jaecoo",
+    "volume": 450,
+    "difficulty": 15,
+    "trend": "+200%",
+    "category": "postventa",
+    "location": "Valladolid",
+    "type": "transaccional",
+    "potential": 82
+  },
+  {
+    "id": "7",
+    "name": "furgonetas segunda mano palencia",
+    "volume": 600,
+    "difficulty": 28,
+    "trend": "-5%",
+    "category": "industrial",
+    "location": "Palencia",
+    "type": "comercial",
+    "potential": 65
+  },
+  {
+    "id": "8",
+    "name": "puntos de carga coche eléctrico valladolid",
+    "volume": 1800,
+    "difficulty": 20,
+    "trend": "+40%",
+    "category": "servicios",
+    "location": "Valladolid",
+    "type": "informativa",
+    "potential": 70
+  },
+  {
+    "id": "9",
+    "name": "comprar coche segunda mano salamanca",
+    "volume": 2100,
+    "difficulty": 70,
+    "trend": "+5%",
+    "category": "ocasión",
+    "location": "Salamanca",
+    "type": "transaccional",
+    "potential": 55
+  },
+  {
+    "id": "10",
+    "name": "lanzamientos dongfeng españa 2026",
+    "volume": 1100,
+    "difficulty": 30,
+    "trend": "+85%",
+    "category": "marcas",
+    "location": "Nacional",
+    "type": "informativa",
+    "potential": 89
+  }
+]
