@@ -57,17 +57,18 @@
 
   // 3. CARGA DE DETALLES (Simulada para estabilidad)
   const fetchDetails = async (kw: Keyword) => {
-    // Generamos una tendencia visual basada en el volumen del keyword
+    // Esto genera puntos en la gráfica automáticamente basados en el volumen
     const mockTrends = [
-      { date: 'Ene', value: kw.volume * 0.6 },
+      { date: 'Ene', value: kw.volume * 0.5 },
       { date: 'Feb', value: kw.volume * 0.8 },
-      { date: 'Mar', value: kw.volume * 1.1 },
+      { date: 'Mar', value: kw.volume * 1.2 },
       { date: 'Abr', value: kw.volume }
     ];
     setTrendData(mockTrends);
+    
     setSuggestions([
-      { id: '1', title: `Estrategia SEO para ${kw.name}`, type: 'Contenido', impact: 'Alto' },
-      { id: '2', title: `Landing Page específica: ${kw.location}`, type: 'Conversión', impact: 'Medio' }
+      { id: '1', title: `Optimizar SEO para ${kw.name}`, type: 'Contenido', impact: 'Alto' },
+      { id: '2', title: `Campaña SEM en ${kw.location}`, type: 'Ads', impact: 'Medio' }
     ]);
   };
 
