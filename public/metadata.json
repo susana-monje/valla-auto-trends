@@ -1,0 +1,7 @@
+{
+  "name": "VallaAuto Trends Pro - SEO Intelligence",
+  "description": "Plataforma avanzada de detección de tendencias y generación automática de landings SEO para el sector automotriz en Valladolid.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
