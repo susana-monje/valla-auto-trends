@@ -1,92 +1,117 @@
-// 1. ESTADOS (Asegúrate de que Keyword, Alert, etc., estén importados de ./types)
+import React, { useState, useEffect } from 'react';
+import { Keyword, Alert, TrendData, ContentSuggestion } from './types';
+
+function App() {
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [analyzing, setAnalyzing] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState<Keyword | null>(null);
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [suggestions, setSuggestions] = useState<ContentSuggestion[]>([]);
-  const [filters, setFilters] = useState({ category: '', type: '', location: '' });
-  const [view, setView] = useState<'dashboard' | 'landings' | 'roi'>('dashboard');
 
-  // 2. CARGA DE DATOS CON "BACKUP" (Si el JSON falla, usa estos datos)
+  // Función para cargar datos desde los JSON en la carpeta public
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Intentamos cargar el archivo, pero si falla (error 404), saltamos al "catch"
       const response = await fetch('/metadata.json');
-      if (!response.ok) throw new Error('Archivo no encontrado');
+      if (!response.ok) throw new Error('No se pudo cargar metadata.json');
       const data = await response.json();
       setKeywords(data);
       if (data.length > 0) setSelectedKeyword(data[0]);
+
+      const alertRes = await fetch('/alerts.json');
+      if (alertRes.ok) setAlerts(await alertRes.json());
     } catch (error) {
-      console.log("Cargando datos de respaldo...");
-      
-      // ESTOS SON LOS DATOS QUE VERÁS SIEMPRE, SIN CEROS:
-      const backupData = [
-        { 
-          id: '1', 
-          name: 'Coches eléctricos Valladolid', 
-          volume: 1200, 
-          difficulty: 45, 
-          trend: '+15%', 
-          category: 'coches', 
-          location: 'Valladolid', 
-          type: 'transaccional', 
-          potential: 85 
-        },
-        { 
-          id: '2', 
-          name: 'Motos de ocasión León', 
-          volume: 850, 
-          difficulty: 30, 
-          trend: '+22%', 
-          category: 'motos', 
-          location: 'León', 
-          type: 'informativa', 
-          potential: 70 
-        }
-      ];
-      
-      setKeywords(backupData);
-      setSelectedKeyword(backupData[0]);
+      console.error("Error cargando datos, usando respaldo:", error);
+      // Datos de respaldo para evitar los "0" si el fetch falla
+      const backup = [{ 
+        id: '1', name: 'Coches Valladolid', volume: 1200, difficulty: 45, 
+        trend: '+15%', category: 'coches', location: 'Valladolid', 
+        type: 'transaccional', potential: 85 
+      }];
+      setKeywords(backup);
+      setSelectedKeyword(backup[0]);
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. CARGA DE DETALLES (Simulada para estabilidad)
-  const fetchDetails = async (kw: Keyword) => {
-    // Esto genera puntos en la gráfica automáticamente basados en el volumen
-    const mockTrends = [
-      { date: 'Ene', value: kw.volume * 0.5 },
-      { date: 'Feb', value: kw.volume * 0.8 },
-      { date: 'Mar', value: kw.volume * 1.2 },
-      { date: 'Abr', value: kw.volume }
-    ];
-    setTrendData(mockTrends);
-    
-    setSuggestions([
-      { id: '1', title: `Optimizar SEO para ${kw.name}`, type: 'Contenido', impact: 'Alto' },
-      { id: '2', title: `Campaña SEM en ${kw.location}`, type: 'Ads', impact: 'Medio' }
-    ]);
-  };
-
-  // 4. EFECTOS DE REACT
   useEffect(() => {
     fetchData();
-    setAlerts([{ id: '1', type: 'warning', message: 'Incremento de búsqueda en sector Híbridos', date: 'Hoy' }]);
   }, []);
 
   useEffect(() => {
-    if (selectedKeyword) fetchDetails(selectedKeyword);
+    if (selectedKeyword) {
+      // Simulamos carga de tendencias basada en la keyword seleccionada
+      setTrendData([
+        { date: 'Ene', value: selectedKeyword.volume * 0.7 },
+        { date: 'Feb', value: selectedKeyword.volume * 0.9 },
+        { date: 'Mar', value: selectedKeyword.volume }
+      ]);
+      setSuggestions([
+        { id: '1', title: `Optimizar SEO para ${selectedKeyword.name}`, type: 'Contenido', impact: 'Alto' }
+      ]);
+    }
   }, [selectedKeyword]);
 
-  // 5. ACCIÓN DEL BOTÓN ACTUALIZAR
-  const handleAnalyze = async () => {
-    setAnalyzing(true);
-    // Simulamos proceso de IA
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setAnalyzing(false);
-    alert("Análisis de mercado actualizado correctamente.");
-  };
+  if (loading) return <div className="p-8 text-center">Cargando VallaAuto Trends...</div>;
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold text-blue-900">VallaAuto Trends</h1>
+        <p className="text-gray-600">SEO Local y Tendencias de Automoción en Valladolid</p>
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Columna Izquierda: Tabla de Keywords */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="p-4 font-semibold text-gray-700">Keyword</th>
+                <th className="p-4 font-semibold text-gray-700">Volumen</th>
+                <th className="p-4 font-semibold text-gray-700">Tendencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              {keywords.map((kw) => (
+                <tr 
+                  key={kw.id} 
+                  onClick={() => setSelectedKeyword(kw)}
+                  className={`border-b cursor-pointer hover:bg-blue-50 ${selectedKeyword?.id === kw.id ? 'bg-blue-50' : ''}`}
+                >
+                  <td className="p-4 font-medium">{kw.name}</td>
+                  <td className="p-4">{kw.volume}</td>
+                  <td className="p-4 text-green-600 font-bold">{kw.trend}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Columna Derecha: Alertas y Detalles */}
+        <div className="space-y-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Alertas Recientes</h2>
+            {alerts.length > 0 ? alerts.map(a => (
+              <div key={a.id} className="p-3 mb-2 bg-yellow-50 text-yellow-800 rounded-lg text-sm">
+                {a.message}
+              </div>
+            )) : <p className="text-gray-500">No hay alertas hoy.</p>}
+          </div>
+
+          {selectedKeyword && (
+            <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-600">
+              <h2 className="text-xl font-bold mb-2 uppercase">{selectedKeyword.name}</h2>
+              <div className="text-3xl font-bold text-blue-600 mb-4">Potencial: {selectedKeyword.potential}%</div>
+              <p className="text-sm text-gray-600">Ubicación: {selectedKeyword.location}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
