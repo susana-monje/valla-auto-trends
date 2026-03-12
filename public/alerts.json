@@ -1,14 +1,14 @@
 [
   {
-    "id": "a1",
+    "id": "alt-1",
     "type": "warning",
-    "message": "Explosión de interés en la marca OMODA en Valladolid (+150%)",
+    "message": "Aumento de búsqueda 'Coches Omoda' en Valladolid",
     "date": "Hace 2 horas"
   },
   {
-    "id": "a2",
+    "id": "alt-2",
     "type": "success",
-    "message": "Nueva keyword de baja dificultad detectada: Taller Jaecoo",
+    "message": "Keyword 'Segunda mano León' ha subido 5 posiciones",
     "date": "Hoy"
   }
 ]
