@@ -5,6 +5,8 @@ function App() {
   const [keywords, setKeywords] = useState<Keyword[]>([]);
   const [selectedKeyword, setSelectedKeyword] = useState<Keyword | null>(null);
   const [loading, setLoading] = useState(true);
+  // ESTO CONTROLA QUÉ PESTAÑA SE VE
+  const [activeTab, setActiveTab] = useState<'Dashboard' | 'Landings' | 'ROI' | 'Alertas'>('Dashboard');
 
   const fetchData = async () => {
     setLoading(true);
@@ -28,180 +30,187 @@ function App() {
 
   useEffect(() => { fetchData(); }, []);
 
-  if (loading) return <div className="flex h-screen items-center justify-center font-bold text-indigo-600">Cargando Intelligence Dashboard...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center font-bold text-indigo-600">Sincronizando VallaAuto Intelligence...</div>;
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-slate-900">
-      {/* BARRA LATERAL IZQUIERDA (SIDEBAR) */}
-      <aside className="w-64 bg-white border-r border-slate-200 hidden lg:flex flex-col">
+      {/* BARRA LATERAL */}
+      <aside className="w-64 bg-white border-r border-slate-200 hidden lg:flex flex-col sticky top-0 h-screen">
         <div className="p-6">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black text-xl">V</div>
+            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-black">V</div>
             <h1 className="text-xl font-black text-indigo-900 tracking-tight">VallaAuto</h1>
           </div>
           <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase ml-10">Intelligence</p>
         </div>
         
         <nav className="flex-1 px-4 space-y-1 mt-4">
-          <div className="flex items-center gap-3 p-3 bg-indigo-50 text-indigo-700 rounded-xl font-bold text-sm cursor-pointer">
-            <span className="text-lg">📊</span> Dashboard
-          </div>
-          <div className="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium cursor-pointer transition-colors">
-            <span className="text-lg">📄</span> Landing Pages
-          </div>
-          <div className="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium cursor-pointer transition-colors">
-            <span className="text-lg">📈</span> ROI & Leads
-          </div>
-          <div className="flex items-center gap-3 p-3 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium cursor-pointer transition-colors">
-            <span className="text-lg">🔔</span> Alertas
-          </div>
+          {[
+            { id: 'Dashboard', icon: '📊', label: 'Dashboard' },
+            { id: 'Landings', icon: '📄', label: 'Landing Pages' },
+            { id: 'ROI', icon: '📈', label: 'ROI & Leads' },
+            { id: 'Alertas', icon: '🔔', label: 'Alertas' }
+          ].map((item) => (
+            <div 
+              key={item.id}
+              onClick={() => setActiveTab(item.id as any)}
+              className={`flex items-center gap-3 p-3 rounded-xl font-bold text-sm cursor-pointer transition-all ${activeTab === item.id ? 'bg-indigo-50 text-indigo-700' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              <span className="text-lg">{item.icon}</span> {item.label}
+            </div>
+          ))}
         </nav>
 
-        <div className="p-4 mt-auto">
+        <div className="p-4">
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
             <div className="flex items-center gap-2 text-emerald-600 mb-1">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-[10px] font-black uppercase">Sistema Activo</span>
+              <span className="text-[10px] font-black uppercase tracking-tighter">Sistema Activo</span>
             </div>
             <p className="text-[10px] font-bold text-slate-400 uppercase">Valladolid, ES</p>
           </div>
         </div>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 p-4 lg:p-10 overflow-y-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-          <div>
-            <h2 className="text-3xl font-extrabold text-slate-900">Inteligencia de Mercado</h2>
-            <p className="text-sm text-slate-500 font-medium mt-1 italic">📍 Valladolid & Castilla y León</p>
-          </div>
-          <div className="flex gap-3">
-            <button className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 flex items-center gap-2">
-              <span>🔄</span> Actualizar Mercado
-            </button>
-            <button className="bg-white border border-slate-200 px-6 py-3 rounded-2xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition-all flex items-center gap-2">
-              <span>📥</span> Exportar
-            </button>
-          </div>
-        </header>
-
-        {/* TARJETAS DE MÉTRICAS (SUPERIORES) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          {[
-            { label: 'Keywords Activas', val: keywords.length, icon: '🔍', color: 'text-blue-600' },
-            { label: 'Tendencias Alza', val: '12', icon: '📈', color: 'text-emerald-600' },
-            { label: 'Alertas Críticas', val: '2', icon: '🚨', color: 'text-red-500' },
-            { label: 'Oportunidades SEO', val: '4', icon: '💡', color: 'text-amber-500' }
-          ].map((card, i) => (
-            <div key={i} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-xl">{card.icon}</span>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{card.label}</p>
+      {/* CONTENIDO PRINCIPAL SEGÚN PESTAÑA */}
+      <main className="flex-1 p-4 lg:p-10">
+        
+        {activeTab === 'Dashboard' && (
+          <div className="animate-in fade-in duration-500">
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+              <div>
+                <h2 className="text-3xl font-extrabold text-slate-900">Dashboard de Mercado</h2>
+                <p className="text-sm text-slate-500 italic">Análisis en tiempo real de tendencias locales</p>
               </div>
-              <p className={`text-5xl font-black ${card.color}`}>{card.val}</p>
+            </header>
+
+            {/* MÉTRICAS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Keywords Activas</p>
+                <p className="text-5xl font-black text-indigo-600">{keywords.length}</p>
+              </div>
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Tendencias Alza</p>
+                <p className="text-5xl font-black text-emerald-600">12</p>
+              </div>
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Alertas Críticas</p>
+                <p className="text-5xl font-black text-red-500">2</p>
+              </div>
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Oportunidades SEO</p>
+                <p className="text-5xl font-black text-amber-500">4</p>
+              </div>
             </div>
-          ))}
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* TABLA DE TENDENCIAS (CENTRO) */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-              <div className="p-8 flex justify-between items-center bg-slate-50/50 border-b border-slate-50">
-                <h3 className="font-extrabold text-xl text-slate-800">Ranking de Tendencias</h3>
-                <div className="flex gap-2">
-                  <span className="text-xs bg-indigo-600 text-white px-4 py-1.5 rounded-full font-bold shadow-md shadow-indigo-100">Todos</span>
-                  <span className="text-xs text-slate-400 bg-white border border-slate-100 px-4 py-1.5 rounded-full font-bold hover:bg-slate-50 cursor-pointer transition-colors">Coches</span>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] border-b border-slate-50">
-                    <tr>
-                      <th className="px-8 py-5">Palabra Clave</th>
-                      <th className="px-8 py-5">Ubicación</th>
-                      <th className="px-8 py-5 text-center">Volumen</th>
-                      <th className="px-8 py-5 text-right">Tendencia</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-sm">
-                    {keywords.map((kw) => (
-                      <tr 
-                        key={kw.id} 
-                        onClick={() => setSelectedKeyword(kw)}
-                        className={`cursor-pointer transition-all border-b border-slate-50 last:border-0 hover:bg-indigo-50/30 ${selectedKeyword?.id === kw.id ? 'bg-indigo-50/60' : ''}`}
-                      >
-                        <td className="px-8 py-5 font-bold text-slate-700 uppercase text-[11px] tracking-tight">{kw.name}</td>
-                        <td className="px-8 py-5 text-slate-400 font-semibold">{kw.location}</td>
-                        <td className="px-8 py-5 text-center text-slate-600 font-bold">{kw.volume}</td>
-                        <td className="px-8 py-5 text-right font-black text-emerald-500">{kw.trend}</td>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              <div className="lg:col-span-2 space-y-8">
+                {/* TABLA PRINCIPAL */}
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                  <div className="p-8 border-b border-slate-50 flex justify-between items-center">
+                    <h3 className="font-extrabold text-xl text-slate-800">Ranking de Tendencias</h3>
+                  </div>
+                  <table className="w-full text-left">
+                    <thead className="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-50">
+                      <tr>
+                        <th className="px-8 py-5">Keyword</th>
+                        <th className="px-8 py-5">Ubicación</th>
+                        <th className="px-8 py-5 text-right">Tendencia</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+                    </thead>
+                    <tbody>
+                      {keywords.map((kw) => (
+                        <tr 
+                          key={kw.id} 
+                          onClick={() => setSelectedKeyword(kw)}
+                          className={`cursor-pointer border-b border-slate-50 last:border-0 hover:bg-indigo-50/30 transition-all ${selectedKeyword?.id === kw.id ? 'bg-indigo-50/60 shadow-inner' : ''}`}
+                        >
+                          <td className="px-8 py-5 font-bold text-slate-700 text-xs uppercase">{kw.name}</td>
+                          <td className="px-8 py-5 text-slate-400 font-medium text-sm">{kw.location}</td>
+                          <td className="px-8 py-5 text-right font-black text-emerald-500">{kw.trend}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-          {/* COLUMNA DERECHA: EVOLUCIÓN E INTELIGENCIA */}
-          <div className="space-y-8">
-            {/* GRÁFICA DE EVOLUCIÓN */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden">
-              <div className="flex justify-between items-start mb-10">
-                <h3 className="font-extrabold text-slate-800 text-lg">Evolución Histórica</h3>
-                <span className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-100">Live Sync</span>
-              </div>
-              
-              {selectedKeyword ? (
-                <div className="space-y-8">
-                  <div className="flex items-end justify-between h-40 gap-3 pt-4">
-                    {[35, 60, 45, 85, 55, 75, 90].map((h, i) => (
-                      <div key={i} className="flex-1 bg-indigo-100 rounded-t-xl relative group transition-all duration-500" style={{ height: `${h}%` }}>
-                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] px-2 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap font-bold shadow-xl">
-                          {h}% Intencion
+                {/* SECCIÓN ESTIMACIÓN ROI & LEADS */}
+                <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm text-center relative overflow-hidden group">
+                   <div className="absolute top-0 right-0 p-4 opacity-5 text-indigo-600 font-black text-8xl transition-all group-hover:scale-110">ROI</div>
+                   <h3 className="font-extrabold text-xl text-slate-800 mb-2">Estimación de ROI & Leads</h3>
+                   <p className="text-slate-400 text-sm mb-8">Proyección basada en volumen y tasas de conversión del sector automoción</p>
+                   
+                   {selectedKeyword ? (
+                     <div className="grid grid-cols-3 gap-4 animate-in slide-in-from-bottom-4 duration-700">
+                        <div className="bg-slate-50 p-6 rounded-3xl">
+                           <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Clicks Est.</p>
+                           <p className="text-2xl font-black text-indigo-600">{Math.floor(selectedKeyword.volume * 0.15)}</p>
                         </div>
-                        <div className={`absolute inset-0 bg-indigo-600 rounded-t-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="pt-6 border-t border-slate-50 flex justify-between items-end">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-widest">Potencial de ROI</p>
-                      <p className="text-6xl font-black text-indigo-600 tracking-tighter">{selectedKeyword.potential}%</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest uppercase">Competencia</p>
-                        <p className="text-sm font-bold text-slate-700">Media-Baja</p>
-                    </div>
-                  </div>
+                        <div className="bg-slate-50 p-6 rounded-3xl border border-indigo-100">
+                           <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Leads Potenciales</p>
+                           <p className="text-2xl font-black text-emerald-600">{Math.floor(selectedKeyword.volume * 0.02)}</p>
+                        </div>
+                        <div className="bg-slate-50 p-6 rounded-3xl">
+                           <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Valor Mercado</p>
+                           <p className="text-2xl font-black text-slate-800">~{Math.floor(selectedKeyword.volume * 1.2)}€</p>
+                        </div>
+                     </div>
+                   ) : (
+                     <div className="py-12 border-2 border-dashed border-slate-100 rounded-[2rem] text-slate-300 font-medium italic">
+                        Selecciona una palabra clave para ver proyecciones de ROI
+                     </div>
+                   )}
                 </div>
-              ) : (
-                <div className="h-48 flex items-center justify-center border-2 border-dashed border-slate-100 rounded-3xl text-slate-300 text-xs text-center p-8 italic">
-                  Selecciona una keyword para analizar la evolución temporal
-                </div>
-              )}
-            </div>
-
-            {/* ALERTAS INTELIGENTES */}
-            <div className="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 font-black text-7xl italic">!</div>
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="font-extrabold text-lg">Alertas IA</h3>
-                <span className="bg-white/10 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-white/10">Real Time</span>
               </div>
-              <div className="space-y-4">
-                <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
-                  <p className="text-[10px] font-black text-indigo-400 mb-2 uppercase tracking-widest">Prioridad Alta</p>
-                  <p className="text-sm font-semibold leading-relaxed">OMODA: Se detecta un pico de interés del 150% en Valladolid esta semana.</p>
+
+              {/* COLUMNA DERECHA */}
+              <div className="space-y-8">
+                <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                  <h3 className="font-extrabold text-slate-800 mb-6">Evolución Histórica</h3>
+                  {selectedKeyword && (
+                    <div className="space-y-6">
+                      <div className="flex items-end justify-between h-32 gap-2">
+                        {[40, 65, 50, 85, 60, 95].map((h, i) => (
+                          <div key={i} className="flex-1 bg-indigo-100 rounded-t-lg transition-all hover:bg-indigo-600" style={{ height: `${h}%` }}></div>
+                        ))}
+                      </div>
+                      <p className="text-5xl font-black text-indigo-600 leading-none">{selectedKeyword.potential}%</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Puntuación de Potencial</p>
+                    </div>
+                  )}
                 </div>
-                <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
-                  <p className="text-[10px] font-black text-emerald-400 mb-2 uppercase tracking-widest">Oportunidad</p>
-                  <p className="text-sm font-semibold leading-relaxed">Keywords "Taller Híbridos" sin competencia en el área de León.</p>
+
+                <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl">
+                   <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span> Alertas Inteligentes
+                   </h3>
+                   <div className="space-y-4">
+                      <div className="bg-white/5 p-4 rounded-2xl border border-white/5 text-sm">
+                         <p className="text-indigo-400 font-bold text-[10px] mb-1">TENDENCIA CRÍTICA</p>
+                         <p className="font-medium text-slate-200 uppercase text-[11px]">Subida del 150% en concesionarios Omoda</p>
+                      </div>
+                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* CONTENIDO PARA LAS OTRAS PESTAÑAS (RELLENO) */}
+        {activeTab !== 'Dashboard' && (
+          <div className="flex flex-col items-center justify-center h-[70vh] text-center animate-in zoom-in-95 duration-300">
+             <div className="text-6xl mb-4">🏗️</div>
+             <h2 className="text-2xl font-black text-slate-800">Sección {activeTab}</h2>
+             <p className="text-slate-400 max-w-sm">Estamos procesando los datos de {activeTab.toLowerCase()} para Valladolid. Vuelve en unos minutos.</p>
+             <button 
+               onClick={() => setActiveTab('Dashboard')}
+               className="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold shadow-lg"
+             >
+               Volver al Dashboard
+             </button>
+          </div>
+        )}
       </main>
     </div>
   );
