@@ -1,47 +1,30 @@
 export interface Keyword {
-  id: number;
-  term: string;
-  slug: string;
-  category: 'car' | 'moto';
-  type: 'buy' | 'price' | 'comparison' | 'financing' | 'service' | 'rental' | 'insurance';
-  location: string;
+  id: string;
+  name: string;
   volume: number;
   difficulty: number;
-  trend_score: number;
-  potential_score: number;
-  est_cpc: number;
-  est_conversion_rate: number;
-  meta_title: string;
-  meta_description: string;
-  content_html: string;
-  faq_json: string; // JSON string
-  schema_markup: string; // JSON string
-  last_updated: string;
-}
-
-export interface TrendData {
-  id: number;
-  keyword_id: number;
-  date: string;
-  volume: number;
+  trend: string;
+  category: string;
+  location: string;
+  type: string;
+  potential: number;
 }
 
 export interface Alert {
-  id: number;
-  keyword_id: number;
-  term: string;
+  id: string;
+  type: 'info' | 'warning' | 'success';
   message: string;
-  type: 'info' | 'warning' | 'success' | 'alert';
-  created_at: string;
-  is_read: number;
+  date: string;
+}
+
+export interface TrendData {
+  date: string;
+  value: number;
 }
 
 export interface ContentSuggestion {
-  id: number;
-  keyword_id: number;
+  id: string;
   title: string;
-  structure: string;
-  meta_description: string;
-  content_type: 'post' | 'landing' | 'ad' | 'social';
-  created_at: string;
+  type: string;
+  impact: string;
 }
