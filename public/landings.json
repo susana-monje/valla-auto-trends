@@ -1,0 +1,23 @@
+[
+  {
+    "id": "lp-1",
+    "url": "/concesionario-omoda-valladolid",
+    "visits": 1450,
+    "conversion": "3.2%",
+    "status": "Optimizada"
+  },
+  {
+    "id": "lp-2",
+    "url": "/coches-electricos-ofertas",
+    "visits": 890,
+    "conversion": "1.8%",
+    "status": "Mejorable"
+  },
+  {
+    "id": "lp-3",
+    "url": "/taller-hibridos-cyl",
+    "visits": 420,
+    "conversion": "4.5%",
+    "status": "Excelente"
+  }
+]
