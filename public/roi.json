@@ -1,0 +1,10 @@
+{
+  "total_investment": 1200,
+  "estimated_revenue": 4500,
+  "roi_percentage": 275,
+  "monthly_leads": [
+    {"month": "Ene", "leads": 45},
+    {"month": "Feb", "leads": 52},
+    {"month": "Mar", "leads": 68}
+  ]
+}
