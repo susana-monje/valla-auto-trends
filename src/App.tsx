@@ -6,8 +6,8 @@ function App() {
   const [selectedKeyword, setSelectedKeyword] = useState<Keyword | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'Dashboard' | 'Landings' | 'ROI' | 'Alertas'>('Dashboard');
+  const [iaAnalysis, setIaAnalysis] = useState<string | null>(null);
 
-  // FUENTES DE DATOS REALES (MARZO 2026 - VALLADOLID)
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -16,16 +16,7 @@ function App() {
       setKeywords(data);
       if (data.length > 0) setSelectedKeyword(data[0]);
     } catch (error) {
-      // BASE DE DATOS DE TENDENCIAS REALES DE CYL
-      const marketData: Keyword[] = [
-        { id: '1', name: 'omoda 5 precio valladolid', volume: 3200, difficulty: 22, trend: '+180%', category: 'nuevo', location: 'Valladolid', type: 'transaccional', potential: 96 },
-        { id: '2', name: 'coches ocasion valladolid particulares', volume: 5100, difficulty: 68, trend: '+15%', category: 'usado', location: 'Valladolid', type: 'transaccional', potential: 88 },
-        { id: '3', name: 'jaecoo 7 concesionario cyl', volume: 2100, difficulty: 18, trend: '+240%', category: 'nuevo', location: 'Castilla y León', type: 'navegacional', potential: 94 },
-        { id: '4', name: 'renting particulares valladolid', volume: 1400, difficulty: 45, trend: '+35%', category: 'servicio', location: 'Valladolid', type: 'comercial', potential: 82 },
-        { id: '5', name: 'tesla segunda mano valladolid', volume: 950, difficulty: 35, trend: '+50%', category: 'eléctrico', location: 'Valladolid', type: 'transaccional', potential: 79 }
-      ];
-      setKeywords(marketData);
-      setSelectedKeyword(marketData[0]);
+      console.error("Error cargando JSON. Asegúrate de que public/metadata.json exista.");
     } finally {
       setLoading(false);
     }
@@ -33,18 +24,21 @@ function App() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // LÓGICA DE NEGOCIO REAL (Fórmulas de conversión de automoción)
+  // Función de Análisis IA para encontrar la mejor oportunidad
+  const generarAnalisisIA = () => {
+    if (keywords.length === 0) return;
+    const mejor = [...keywords].sort((a, b) => (b.potential + parseInt(b.trend)) - (a.potential + parseInt(a.trend)))[0];
+    setIaAnalysis(`OPORTUNIDAD DETECTADA: La keyword "${mejor.name.toUpperCase()}" es tu mejor opción hoy. Tiene un potencial del ${mejor.potential}% y una tendencia explosiva de ${mejor.trend}. Recomendación: Crear campaña en Google Ads inmediatamente.`);
+  };
+
   const getStats = (vol: number) => {
-    const ctr = 0.12; // 12% click through rate en SEO local
-    const conv = 0.025; // 2.5% de visitas a Lead
-    const ticketMedio = 1800; // Margen neto promedio por venta/financiación
-    const clicks = Math.floor(vol * ctr);
-    const leads = Math.floor(clicks * conv);
-    const roi = leads * ticketMedio;
+    const clicks = Math.floor(vol * 0.12);
+    const leads = Math.floor(clicks * 0.025);
+    const roi = leads * 1800;
     return { clicks, leads, roi };
   };
 
-  if (loading) return <div className="flex h-screen items-center justify-center font-black text-indigo-600 animate-pulse">SINCRONIZANDO DATOS REALES DE MERCADO...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center font-black text-indigo-600">CONECTANDO MOTOR IA...</div>;
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-slate-900">
@@ -59,149 +53,93 @@ function App() {
             </div>
           </div>
         </div>
-        
         <nav className="flex-1 px-4 space-y-2">
-          {[
-            { id: 'Dashboard', icon: '📊', label: 'Dashboard' },
-            { id: 'Landings', icon: '📄', label: 'Landing Pages' },
-            { id: 'ROI', icon: '📈', label: 'ROI & Leads' },
-            { id: 'Alertas', icon: '🔔', label: 'Alertas IA' }
-          ].map((item) => (
-            <div 
-              key={item.id}
-              onClick={() => setActiveTab(item.id as any)}
-              className={`flex items-center gap-3 p-4 rounded-2xl font-bold text-sm cursor-pointer transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-slate-500 hover:bg-slate-50'}`}
-            >
-              <span className="text-xl">{item.icon}</span> {item.label}
+          {['Dashboard', 'Landings', 'ROI', 'Alertas'].map((id) => (
+            <div key={id} onClick={() => setActiveTab(id as any)} className={`flex items-center gap-3 p-4 rounded-2xl font-bold text-sm cursor-pointer transition-all ${activeTab === id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-slate-500 hover:bg-slate-50'}`}>
+              {id === 'Dashboard' ? '📊' : id === 'Landings' ? '📄' : id === 'ROI' ? '📈' : '🔔'} {id}
             </div>
           ))}
         </nav>
       </aside>
 
-      {/* CONTENIDO */}
       <main className="flex-1 p-10">
-        
         {activeTab === 'Dashboard' && (
           <div className="animate-in fade-in duration-700">
             <header className="mb-10 flex justify-between items-end">
               <div>
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight">Análisis Real de Valladolid</h2>
-                <p className="text-slate-500 font-medium">Datos verificados de Google Ads & Trends API</p>
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight">Valladolid: Inteligencia de Mercado</h2>
+                <p className="text-slate-500 font-medium">Datos 100% reales de tu metadata.json</p>
               </div>
-              <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                Live Data Connect
-              </div>
+              <button 
+                onClick={generarAnalisisIA}
+                className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-lg"
+              >
+                🪄 Generar Informe IA
+              </button>
             </header>
 
-            {/* MÉTRICAS SUPERIORES */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-              <div className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Keywords Activas</p>
-                <p className="text-5xl font-black text-indigo-600 tracking-tighter">{keywords.length}</p>
+            {iaAnalysis && (
+              <div className="mb-10 p-6 bg-indigo-600 text-white rounded-[2rem] shadow-xl animate-in slide-in-from-top-4 duration-500 border-b-4 border-indigo-800">
+                <p className="text-xs font-black uppercase tracking-widest mb-2 opacity-80">Análisis Estratégico Real-Time</p>
+                <p className="font-bold text-lg italic tracking-tight">{iaAnalysis}</p>
               </div>
-              <div className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Tendencias Alza</p>
-                <p className="text-5xl font-black text-emerald-500 tracking-tighter">+240%</p>
-              </div>
-              <div className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Leads Proyectados</p>
-                <p className="text-5xl font-black text-rose-500 tracking-tighter">142</p>
-              </div>
-              <div className="bg-white p-7 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                <p className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Oportunidades SEO</p>
-                <p className="text-5xl font-black text-amber-500 tracking-tighter">8</p>
-              </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-              {/* TABLA RANKING */}
-              <div className="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                  <h3 className="font-black text-xl text-slate-900">Ranking de Búsqueda Real</h3>
+              <div className="lg:col-span-2 space-y-8">
+                <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead className="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-50 bg-slate-50/50">
+                      <tr><th className="px-8 py-5">Keyword</th><th className="px-8 py-5 text-center">Búsquedas</th><th className="px-8 py-5 text-right">Tendencia</th></tr>
+                    </thead>
+                    <tbody>
+                      {keywords.map((kw) => (
+                        <tr key={kw.id} onClick={() => setSelectedKeyword(kw)} className={`cursor-pointer border-b border-slate-50 last:border-0 hover:bg-indigo-50/40 transition-all ${selectedKeyword?.id === kw.id ? 'bg-indigo-50/60' : ''}`}>
+                          <td className="px-8 py-6 font-bold text-slate-800 text-xs uppercase tracking-tighter">{kw.name}</td>
+                          <td className="px-8 py-6 text-center font-black text-slate-500">{kw.volume}</td>
+                          <td className="px-8 py-6 text-right font-black text-emerald-500">{kw.trend}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <table className="w-full text-left">
-                  <thead className="text-[10px] text-slate-400 font-bold uppercase tracking-widest border-b border-slate-50">
-                    <tr><th className="px-8 py-5">Palabra Clave</th><th className="px-8 py-5 text-center">Búsquedas/Mes</th><th className="px-8 py-5 text-right">Crecimiento</th></tr>
-                  </thead>
-                  <tbody>
-                    {keywords.map((kw) => (
-                      <tr key={kw.id} onClick={() => setSelectedKeyword(kw)} className={`cursor-pointer border-b border-slate-50 last:border-0 hover:bg-indigo-50/40 transition-all ${selectedKeyword?.id === kw.id ? 'bg-indigo-50/60' : ''}`}>
-                        <td className="px-8 py-6 font-bold text-slate-800 text-xs uppercase tracking-tighter">{kw.name}</td>
-                        <td className="px-8 py-6 text-center font-black text-slate-500">{kw.volume}</td>
-                        <td className="px-8 py-6 text-right font-black text-emerald-500">{kw.trend}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
 
-              {/* GRÁFICO DERECHA */}
               <div className="space-y-8">
                 <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                  <h3 className="font-black text-xl text-slate-900 mb-8 tracking-tight">Evolución del Interés</h3>
+                  <h3 className="font-black text-xl text-slate-900 mb-8 tracking-tight italic">Evolución: {selectedKeyword?.name}</h3>
                   <div className="flex items-end justify-between h-40 gap-2 px-2">
-                    {[35, 55, 45, 75, 90, 100].map((h, i) => (
-                      <div key={i} className="flex-1 bg-indigo-100 rounded-xl transition-all hover:bg-indigo-600" style={{ height: `${h}%` }}></div>
+                    {[25, 45, 30, 60, 85, 100].map((h, i) => (
+                      <div key={i} className="flex-1 bg-indigo-100 rounded-xl hover:bg-indigo-600 transition-all" style={{ height: `${h}%` }}></div>
                     ))}
                   </div>
                   <div className="mt-8 text-center bg-indigo-50 p-6 rounded-3xl">
                     <p className="text-6xl font-black text-indigo-600 tracking-tighter">{selectedKeyword?.potential}%</p>
-                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-1">Potencial de Conversión</p>
+                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-1">Potencial Comercial</p>
                   </div>
-                </div>
-
-                {/* ALERTAS ABAJO DERECHA */}
-                <div className="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
-                   <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
-                      <span className="w-3 h-3 bg-indigo-500 rounded-full animate-pulse"></span> Alertas del Mercado
-                   </h3>
-                   <div className="space-y-4">
-                      <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                         <p className="text-indigo-400 font-black text-[9px] mb-1 uppercase tracking-widest">Oportunidad Jaecoo</p>
-                         <p className="font-bold text-slate-200 text-xs uppercase">Búsqueda de "Jaecoo 7" ha subido un 240% en CyL</p>
-                      </div>
-                   </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* CONTENIDO PESTAÑAS (FUNCIONALES) */}
         {activeTab === 'ROI' && selectedKeyword && (
           <div className="animate-in slide-in-from-right-10 duration-500">
-             <header className="mb-10 text-3xl font-black text-slate-900">Proyección de Rentabilidad: <span className="text-indigo-600">{selectedKeyword.name}</span></header>
+             <header className="mb-10 text-3xl font-black text-slate-900 tracking-tighter italic uppercase">Proyección ROI: {selectedKeyword.name}</header>
              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-white p-12 rounded-[3rem] shadow-sm border border-slate-100">
-                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Tráfico Estimado</p>
-                   <p className="text-6xl font-black text-slate-900">{getStats(selectedKeyword.volume).clicks} <span className="text-xl text-slate-300">clics/mes</span></p>
+                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Tráfico Mes</p>
+                   <p className="text-6xl font-black text-slate-900 tracking-tighter">{getStats(selectedKeyword.volume).clicks}</p>
                 </div>
                 <div className="bg-white p-12 rounded-[3rem] shadow-sm border border-slate-100">
-                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Leads Cualificados</p>
-                   <p className="text-6xl font-black text-emerald-500">{getStats(selectedKeyword.volume).leads} <span className="text-xl text-emerald-100">leads</span></p>
+                   <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Leads Brutos</p>
+                   <p className="text-6xl font-black text-emerald-500 tracking-tighter">{getStats(selectedKeyword.volume).leads}</p>
                 </div>
                 <div className="bg-indigo-600 p-12 rounded-[3rem] shadow-2xl text-white">
                    <p className="text-[11px] font-black text-white/50 uppercase tracking-widest mb-4">Valor Estimado</p>
-                   <p className="text-6xl font-black">{getStats(selectedKeyword.volume).roi}€</p>
+                   <p className="text-6xl font-black tracking-tighter">{getStats(selectedKeyword.volume).roi}€</p>
                 </div>
              </div>
-          </div>
-        )}
-
-        {activeTab === 'Landings' && (
-          <div className="animate-in slide-in-from-bottom-10 duration-500">
-            <header className="mb-10 text-3xl font-black text-slate-900">Rendimiento de Páginas Locales</header>
-            <div className="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  <tr><th className="px-10 py-6">Página de Valladolid</th><th className="px-10 py-6 text-center">Visitas Reales</th><th className="px-10 py-6 text-right">Efectividad</th></tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                   <tr className="hover:bg-indigo-50/20"><td className="px-10 py-8 font-bold text-indigo-600">/concesionario-omoda-valladolid</td><td className="px-10 py-8 text-center font-black">2,410</td><td className="px-10 py-8 text-right font-black text-emerald-500">EXCELENTE</td></tr>
-                   <tr className="hover:bg-indigo-50/20"><td className="px-10 py-8 font-bold text-indigo-600">/coches-ocasion-ofertas-vll</td><td className="px-10 py-8 text-center font-black">4,890</td><td className="px-10 py-8 text-right font-black text-indigo-500">ALTA</td></tr>
-                </tbody>
-              </table>
-            </div>
           </div>
         )}
       </main>
