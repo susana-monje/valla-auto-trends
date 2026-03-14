@@ -1,242 +1,170 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 
-type Page = "dashboard" | "landings" | "roi";
+// --- BASE DE DATOS MAESTRA (image_0e7903.png y image_0e7cff.png) ---
+const DATA_MASTER = [
+  { id: 1, name: "OMODA 5 VALLADOLID", volume: 3200, trend: 185, type: "Compra", region: "Valladolid", category: "Coches", leads: 24, status: 'ACTIVA' },
+  { id: 2, name: "JAECOO 7 PRECIO ESPAÑA", volume: 2400, trend: 210, type: "Precios", region: "España", category: "Coches", leads: 12, status: 'ACTIVA' },
+  { id: 3, name: "COCHES OCASION VALLADOLID PARTICULARES", volume: 5400, trend: 12, type: "Compra", region: "Valladolid", category: "Coches", leads: 45, status: 'PAUSADA' },
+  { id: 4, name: "CONCESIONARIO OMODA VALLADOLID", volume: 1900, trend: 320, type: "Compra", region: "Valladolid", category: "Coches", leads: 8, status: 'ACTIVA' },
+  { id: 5, name: "ALQUILER FURGONETAS VALLADOLID", volume: 1800, trend: 45, type: "Alquiler", region: "Valladolid", category: "Coches", leads: 15, status: 'ACTIVA' },
+  { id: 6, name: "RENTING PARTICULARES VALLADOLID", volume: 1100, trend: 28, type: "Renting", region: "Valladolid", category: "Coches", leads: 10, status: 'ACTIVA' },
+  { id: 7, name: "MOTOS OCASIÓN LEÓN", volume: 850, trend: 12, type: "Compra", region: "Castilla y León", category: "Motos", leads: 5, status: 'ACTIVA' },
+];
 
 export default function App() {
-  const [page, setPage] = useState<Page>("dashboard");
+  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [region, setRegion] = useState('Valladolid');
+  const [type, setType] = useState('Todos los tipos');
+  const [category, setCategory] = useState('Todos');
+  const [filteredData, setFilteredData] = useState(DATA_MASTER);
 
-  return (
-    <div className="flex h-screen bg-gray-100 font-sans">
+  // --- LÓGICA DE FILTRADO REAL ---
+  useEffect(() => {
+    const result = DATA_MASTER.filter(k => {
+      const matchRegion = region === 'Toda España' || k.region === region;
+      const matchType = type === 'Todos los tipos' || k.type === type;
+      const matchCat = category === 'Todos' || k.category === category;
+      return matchRegion && matchType && matchCat;
+    });
+    setFilteredData(result);
+  }, [region, type, category]);
 
-      {/* SIDEBAR */}
-
-      <div className="w-64 bg-white shadow-md p-6">
-
-        <div className="flex items-center gap-2 mb-10">
-          <div className="w-10 h-10 rounded-lg bg-purple-600 text-white flex items-center justify-center font-bold">
-            V
-          </div>
-          <div>
-            <div className="font-bold text-lg">VallaAuto</div>
-            <div className="text-xs text-gray-400">INTELLIGENCE</div>
-          </div>
-        </div>
-
-        <nav className="space-y-3">
-
-          <button
-            onClick={() => setPage("dashboard")}
-            className={`w-full text-left p-3 rounded-lg ${
-              page === "dashboard" ? "bg-indigo-100" : ""
-            }`}
-          >
-            📊 Dashboard
-          </button>
-
-          <button
-            onClick={() => setPage("landings")}
-            className={`w-full text-left p-3 rounded-lg ${
-              page === "landings" ? "bg-indigo-100" : ""
-            }`}
-          >
-            📄 Landings
-          </button>
-
-          <button
-            onClick={() => setPage("roi")}
-            className={`w-full text-left p-3 rounded-lg ${
-              page === "roi" ? "bg-indigo-100" : ""
-            }`}
-          >
-            📈 ROI & Leads
-          </button>
-
-          <button className="w-full text-left p-3 rounded-lg">
-            🔔 Alertas
-          </button>
-
-          <button className="w-full text-left p-3 rounded-lg">
-            🎯 Campañas
-          </button>
-
-        </nav>
-      </div>
-
-      {/* MAIN */}
-
-      <div className="flex-1 p-10 overflow-auto">
-
-        {page === "dashboard" && <Dashboard />}
-        {page === "landings" && <Landings />}
-        {page === "roi" && <ROI />}
-
-      </div>
-    </div>
-  );
-}
-
-function Stats() {
-  return (
+  // --- COMPONENTE DE MÉTRICAS SUPERIORES (image_0e9389.png) ---
+  const HeaderMetrics = () => (
     <div className="grid grid-cols-4 gap-6 mb-10">
-
-      <Card title="Keywords activas" value="10" color="text-indigo-600" />
-      <Card title="Tendencias alza" value="+240%" color="text-green-500" />
-      <Card title="Leads proyectados" value="142" color="text-red-500" />
-      <Card title="Oportunidades SEO" value="8" color="text-orange-500" />
-
-    </div>
-  );
-}
-
-function Card({ title, value, color }: any) {
-  return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
-      <div className="text-sm text-gray-400 mb-2">{title}</div>
-      <div className={`text-4xl font-bold ${color}`}>{value}</div>
-    </div>
-  );
-}
-
-function Dashboard() {
-  return (
-    <div>
-
-      <h1 className="text-3xl font-bold mb-1">Dashboard</h1>
-      <p className="text-gray-400 mb-6">
-        Datos verificados de Google Ads & Trends API
-      </p>
-
-      <Stats />
-
-      <div className="grid grid-cols-3 gap-6">
-
-        <div className="col-span-2 bg-white rounded-2xl p-6">
-
-          <h2 className="font-bold mb-4">Ranking de Búsqueda Real</h2>
-
-          <table className="w-full text-sm">
-
-            <thead className="text-gray-400">
-              <tr>
-                <th className="text-left pb-3">Palabra clave</th>
-                <th className="text-left">Búsquedas</th>
-                <th className="text-left">Crecimiento</th>
-              </tr>
-            </thead>
-
-            <tbody className="space-y-2">
-
-              <tr>
-                <td>OMODA 5 VALLADOLID</td>
-                <td>3200</td>
-                <td className="text-green-500">+185%</td>
-              </tr>
-
-              <tr>
-                <td>JAECOO 7 PRECIO ESPAÑA</td>
-                <td>2400</td>
-                <td className="text-green-500">+210%</td>
-              </tr>
-
-              <tr>
-                <td>COCHES OCASION VALLADOLID</td>
-                <td>5400</td>
-                <td className="text-green-500">+12%</td>
-              </tr>
-
-            </tbody>
-
-          </table>
-        </div>
-
-        <div className="bg-white rounded-2xl p-6 flex flex-col justify-center items-center">
-
-          <div className="text-gray-400 mb-2">Potencial IA</div>
-          <div className="text-6xl font-bold text-indigo-600">95%</div>
-
-        </div>
-
+      <div className="bg-white p-8 rounded-[2rem] border border-slate-50 shadow-sm text-center">
+        <p className="text-[10px] font-black text-slate-300 uppercase mb-2 tracking-widest">KEYWORDS ACTIVAS</p>
+        <p className="text-5xl font-black text-[#4F46E5]">{filteredData.length}</p>
+      </div>
+      <div className="bg-white p-8 rounded-[2rem] border border-slate-50 shadow-sm text-center">
+        <p className="text-[10px] font-black text-slate-300 uppercase mb-2 tracking-widest">TENDENCIAS ALZA</p>
+        <p className="text-5xl font-black text-[#10B981]">+{filteredData.length > 0 ? Math.max(...filteredData.map(d => d.trend)) : 0}%</p>
+      </div>
+      <div className="bg-white p-8 rounded-[2rem] border border-slate-50 shadow-sm text-center">
+        <p className="text-[10px] font-black text-slate-300 uppercase mb-2 tracking-widest">LEADS PROYECTADOS</p>
+        <p className="text-5xl font-black text-[#F43F5E]">{filteredData.reduce((acc, curr) => acc + curr.leads, 0)}</p>
+      </div>
+      <div className="bg-white p-8 rounded-[2rem] border border-slate-50 shadow-sm text-center">
+        <p className="text-[10px] font-black text-slate-300 uppercase mb-2 tracking-widest">OPORTUNIDADES SEO</p>
+        <p className="text-5xl font-black text-[#F59E0B]">{filteredData.filter(d => d.trend > 100).length}</p>
       </div>
     </div>
   );
-}
 
-function Landings() {
   return (
-    <div>
-
-      <h1 className="text-3xl font-bold mb-1">Landings</h1>
-      <p className="text-gray-400 mb-6">
-        Datos verificados de Google Ads & Trends API
-      </p>
-
-      <Stats />
-
-      <div className="bg-white rounded-2xl p-6">
-
-        <table className="w-full">
-
-          <thead className="text-gray-400">
-            <tr>
-              <th className="text-left pb-4">Página de destino</th>
-              <th className="text-left">Visitas</th>
-              <th className="text-left">Conv.</th>
-            </tr>
-          </thead>
-
-          <tbody>
-
-            <tr>
-              <td className="text-indigo-600">/concesionario-omoda-valladolid</td>
-              <td>2.450</td>
-              <td className="text-green-500">4.2%</td>
-            </tr>
-
-            <tr>
-              <td className="text-indigo-600">/jaecoo-7-ofertas</td>
-              <td>1.820</td>
-              <td className="text-green-500">3.8%</td>
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-    </div>
-  );
-}
-
-function ROI() {
-  return (
-    <div>
-
-      <h1 className="text-3xl font-bold mb-1">ROI & Leads</h1>
-      <p className="text-gray-400 mb-6">
-        Datos verificados de Google Ads & Trends API
-      </p>
-
-      <Stats />
-
-      <div className="grid grid-cols-3 gap-6">
-
-        <div className="bg-white p-6 rounded-2xl text-center">
-          <div className="text-gray-400">Inversión estimada</div>
-          <div className="text-5xl font-bold mt-2">306€</div>
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0F172A]">
+      
+      {/* SIDEBAR (image_0e8121.png) */}
+      <aside className="w-72 bg-white border-r border-slate-100 flex flex-col sticky top-0 h-screen">
+        <div className="p-10 flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#4F46E5] rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg italic">V</div>
+          <h1 className="text-xl font-black italic">VallaAuto</h1>
         </div>
+        <nav className="flex-1 px-6 space-y-2">
+          {[
+            { id: 'Dashboard', icon: '📊' }, { id: 'Landings', icon: '📄' }, 
+            { id: 'ROI & Leads', icon: '📈' }, { id: 'Alertas', icon: '🔔' }, { id: 'Campañas', icon: '🎯' }
+          ].map((item) => (
+            <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold text-sm transition-all ${activeTab === item.id ? 'bg-indigo-50 text-[#4F46E5]' : 'text-slate-400 hover:bg-slate-50'}`}>
+              <span className="text-lg">{item.icon}</span> {item.id}
+            </button>
+          ))}
+        </nav>
+      </aside>
 
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 rounded-2xl text-center text-white">
-          <div>Leads reales</div>
-          <div className="text-5xl font-bold mt-2">14</div>
-        </div>
+      <main className="flex-1 p-10">
+        <header className="mb-10 flex justify-between items-start">
+          <div>
+            <h2 className="text-4xl font-black italic uppercase tracking-tighter">{activeTab}</h2>
+            <p className="text-slate-400 font-medium italic">Datos verificados de Google Ads & Trends API</p>
+          </div>
+          <div className="bg-[#F0FDF4] text-[#166534] px-4 py-2 rounded-full text-[10px] font-black border border-[#DCFCE7] tracking-widest">LIVE DATA CONNECT</div>
+        </header>
 
-        <div className="bg-white p-6 rounded-2xl text-center">
-          <div className="text-gray-400">Retorno bruto</div>
-          <div className="text-5xl font-bold text-green-500 mt-2">3600€</div>
-        </div>
+        <HeaderMetrics />
 
-      </div>
+        {/* --- VISTA: DASHBOARD / CAMPAÑAS (image_0e7903.png y image_0e7cff.png) --- */}
+        {(activeTab === 'Dashboard' || activeTab === 'Campañas') && (
+          <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
+            <div className="flex justify-between items-center mb-10">
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter">Ranking de Búsqueda Real</h3>
+              <div className="flex bg-slate-100 p-1.5 rounded-2xl">
+                {['Todos', 'Coches', 'Motos'].map(c => (
+                  <button key={c} onClick={() => setCategory(c)} className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${category === c ? 'bg-white text-[#4F46E5] shadow-sm' : 'text-slate-400'}`}>
+                    {c === 'Coches' ? '🚗 Coches' : c === 'Motos' ? '🏍️ Motos' : 'Ver Todos'}
+                  </button>
+                ))}
+              </div>
+            </div>
 
+            <div className="flex gap-4 mb-10">
+              <select value={region} onChange={(e) => setRegion(e.target.value)} className="bg-slate-50 border-none p-4 rounded-2xl font-black text-xs uppercase cursor-pointer">
+                <option value="Toda España">📍 Toda España</option>
+                <option value="Valladolid">📍 Valladolid</option>
+                <option value="Castilla y León">📍 Castilla y León</option>
+              </select>
+              <select value={type} onChange={(e) => setType(e.target.value)} className="bg-slate-50 border-none p-4 rounded-2xl font-black text-xs uppercase cursor-pointer">
+                <option value="Todos los tipos">🔍 Todos los tipos</option>
+                <option value="Compra">Compra</option>
+                <option value="Alquiler">Alquiler</option>
+                <option value="Renting">Renting</option>
+              </select>
+            </div>
+
+            <table className="w-full text-left">
+              <thead className="text-[10px] text-slate-300 font-black uppercase tracking-widest border-b border-slate-50">
+                <tr><th className="pb-6">PALABRA CLAVE</th><th className="pb-6 text-center">INTENCIÓN</th><th className="pb-6 text-center">BÚSQUEDAS</th><th className="pb-6 text-right">CRECIMIENTO</th></tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50 font-bold italic">
+                {filteredData.map((kw) => (
+                  <tr key={kw.id} className="hover:bg-slate-50 transition-all">
+                    <td className="py-6 text-sm uppercase tracking-tighter">{kw.name}</td>
+                    <td className="py-6 text-center"><span className="px-3 py-1 bg-slate-100 text-[9px] font-black rounded-full uppercase">{kw.type}</span></td>
+                    <td className="py-6 text-center text-slate-400 font-black text-lg">{kw.volume}</td>
+                    <td className="py-6 text-right text-[#10B981] font-black text-lg">+{kw.trend}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* --- VISTA: LANDING PAGES (image_0ef1f9.png) --- */}
+        {activeTab === 'Landings' && (
+          <div className="bg-white rounded-[3rem] p-32 text-center border border-slate-100 italic shadow-sm">
+            <h3 className="text-slate-300 font-black text-2xl uppercase tracking-widest">SINCRONIZADO CON GOOGLE SEARCH CONSOLE...</h3>
+          </div>
+        )}
+
+        {/* --- VISTA: ROI & LEADS (image_049303.png) --- */}
+        {activeTab === 'ROI & Leads' && (
+          <div className="grid grid-cols-3 gap-8">
+            <div className="bg-white p-12 rounded-[3rem] border border-slate-50 shadow-sm text-center">
+              <p className="text-5xl font-black">306€</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase mt-4">INVERSIÓN ESTIMADA</p>
+            </div>
+            <div className="bg-[#4F46E5] p-12 rounded-[3rem] text-white shadow-xl text-center">
+              <p className="text-5xl font-black">14</p>
+              <p className="text-[10px] font-black opacity-60 uppercase mt-4">LEADS REALES</p>
+            </div>
+            <div className="bg-white p-12 rounded-[3rem] border border-slate-50 shadow-sm text-center">
+              <p className="text-5xl font-black text-[#10B981]">3600€</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase mt-4">RETORNO BRUTO</p>
+            </div>
+          </div>
+        )}
+
+        {/* --- VISTA: ALERTAS (image_049058.png) --- */}
+        {activeTab === 'Alertas' && (
+          <div className="bg-white p-10 rounded-[3rem] border-l-[12px] border-rose-500 shadow-sm flex items-center gap-6">
+            <span className="text-4xl">🔥</span>
+            <div>
+              <p className="text-rose-500 font-black text-[10px] uppercase tracking-widest">CRÍTICA</p>
+              <p className="font-bold italic text-xl">OMODA subiendo un 150% en Valladolid.</p>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
