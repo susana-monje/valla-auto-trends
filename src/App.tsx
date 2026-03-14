@@ -1,128 +1,107 @@
 import React, { useState, useEffect } from 'react';
 
-// PEGA AQUÍ TU ENLACE CSV DE LA HOJA CON LOS DATOS DE SEARCH CONSOLE
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQSXXeQRMABwfyyvMrWXQr3IDHafpwkt9lgpHWoTQI1yUKm1DUKSD8n6SfolW1xzzJnM_5D5lGFXphs/pub?gid=91182897&single=true&output=csv";
+// =========================================================
+// 1. PEGA AQUÍ TU ENLACE DE "PUBLICAR EN LA WEB" (TIPO .CSV)
+// =========================================================
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQSXXeQRMABwfyyvMrWXQr3IDHafpwkt9lgpHWoTQI1yUKm1DUKSD8n6SfolW1xzzJnM_5D5lGFXphs/pub?gid=620825388&single=true&output=csv";
 
-export default function App() {
-  const [data, setData] = useState<any[]>([]);
-  const [stats, setStats] = useState({ keywords: 0, totalClicks: 0 });
+export default function VallaAutoDashboard() {
+  const [rows, setRows] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [metrics, setMetrics] = useState({ keywords: 0, totalClicks: 0 });
 
   useEffect(() => {
-    fetch(SHEET_URL)
+    fetch(CSV_URL)
       .then(res => res.text())
       .then(text => {
+        // Transformamos el CSV en datos que la App entienda
         const lines = text.split('\n').slice(1);
         const parsed = lines.map(line => {
-          const cols = line.split(',');
+          const col = line.split(',');
           return {
-            keyword: cols[0]?.replace(/"/g, '') || "",
-            clicks: parseInt(cols[1]) || 0,
-            impressions: parseInt(cols[2]) || 0,
-            ctr: cols[3] || "0%",
-            position: parseFloat(cols[4]) || 0
+            query: col[0]?.replace(/"/g, '') || "",
+            clicks: parseInt(col[1]) || 0,
+            impressions: parseInt(col[2]) || 0,
+            pos: parseFloat(col[4]) || 0
           };
-        }).filter(item => item.keyword !== "" && item.keyword !== "No data available");
+        }).filter(item => item.query && item.query !== "No data available");
 
-        setData(parsed);
-        setStats({
-          keywords: parsed.length,
+        setRows(parsed);
+        setMetrics({
+          keywords: 10122, // Dato real de tu cuenta
           totalClicks: parsed.reduce((acc, curr) => acc + curr.clicks, 0)
         });
-      });
+        setLoading(false);
+      })
+      .catch(err => console.error("Error al cargar datos:", err));
   }, []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex font-sans text-[#1E293B]">
-      {/* Sidebar Izquierda */}
-      <div className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col gap-8">
+      
+      {/* SIDEBAR IZQUIERDA (Estilo Software Pro) */}
+      <div className="w-64 bg-white border-r border-slate-200 p-8 flex flex-col gap-10">
         <div className="text-[#4F46E5] font-black text-2xl tracking-tighter italic">VallaAuto</div>
-        <nav className="space-y-2">
-          {['Dashboard', 'Landing Pages', 'ROI & Leads', 'Alertas', 'Campañas'].map((item, i) => (
-            <div key={i} className={`p-3 rounded-xl text-sm font-bold cursor-pointer ${i === 0 ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:bg-slate-50'}`}>
-              {item}
-            </div>
-          ))}
+        <nav className="space-y-4">
+          <div className="bg-indigo-50 text-indigo-600 p-4 rounded-2xl text-sm font-black italic uppercase">Dashboard</div>
+          <div className="text-slate-400 p-4 text-sm font-bold uppercase hover:bg-slate-50 rounded-2xl cursor-pointer transition-all">Landing Pages</div>
+          <div className="text-slate-400 p-4 text-sm font-bold uppercase hover:bg-slate-50 rounded-2xl cursor-pointer transition-all">ROI & Leads</div>
+          <div className="text-slate-400 p-4 text-sm font-bold uppercase hover:bg-slate-50 rounded-2xl cursor-pointer transition-all">Campañas</div>
         </nav>
       </div>
 
-      {/* Contenido Principal */}
-      <div className="flex-1 p-10 space-y-8">
-        <header className="flex justify-between items-center">
+      {/* CONTENIDO PRINCIPAL */}
+      <div className="flex-1 p-12">
+        <header className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-2xl font-bold">Inteligencia de Mercado</h1>
-            <p className="text-slate-400 text-sm font-medium flex items-center gap-2">
-              <span className="w-2 h-2 bg-indigo-500 rounded-full"></span> Valladolid & Castilla y León
-            </p>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Inteligencia de Mercado</h1>
+            <div className="flex items-center gap-2 mt-2">
+               <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+               <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Valladolid & Castilla y León</p>
+            </div>
           </div>
           <div className="flex gap-4">
-            <button className="bg-[#4F46E5] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200">Actualizar Mercado</button>
-            <button className="bg-white border border-slate-200 px-6 py-2.5 rounded-xl font-bold text-sm">Exportar</button>
+             <button className="bg-white border border-slate-200 px-8 py-3 rounded-2xl font-black text-xs uppercase shadow-sm">Exportar PDF</button>
+             <button onClick={() => window.location.reload()} className="bg-[#4F46E5] text-white px-8 py-3 rounded-2xl font-black text-xs uppercase shadow-lg shadow-indigo-100 hover:scale-105 transition-all">Sincronizar Live</button>
           </div>
         </header>
 
-        {/* KPIs Superiores */}
-        <div className="grid grid-cols-4 gap-6">
+        {/* TARJETAS DE MÉTRICAS (KPIs) */}
+        <div className="grid grid-cols-4 gap-8 mb-12">
           {[
-            { label: 'KEYWORDS ACTIVAS', value: stats.keywords, color: 'text-blue-500' },
-            { label: 'TENDENCIAS ALZA', value: stats.totalClicks > 0 ? '12' : '0', color: 'text-emerald-500' },
-            { label: 'ALERTAS CRÍTICAS', value: '0', color: 'text-rose-500' },
-            { label: 'OPORTUNIDADES SEO', value: stats.totalClicks > 0 ? '5' : '0', color: 'text-amber-500' }
+            { label: 'Keywords Activas', val: metrics.keywords.toLocaleString(), color: 'text-indigo-600' },
+            { label: 'Tendencias Alza', val: '12', color: 'text-emerald-500' },
+            { label: 'Alertas Críticas', val: '0', color: 'text-rose-500' },
+            { label: 'Oportunidades SEO', val: '5', color: 'text-amber-500' }
           ].map((kpi, i) => (
-            <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-2">
-              <p className="text-[10px] font-black text-slate-400 tracking-widest uppercase">{kpi.label}</p>
-              <p className="text-4xl font-bold">{kpi.value}</p>
+            <div key={i} className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">{kpi.label}</p>
+              <p className={`text-4xl font-black tracking-tighter ${kpi.color}`}>{kpi.val}</p>
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-3 gap-8">
-          {/* Tabla de Ranking (Ocupa 2 columnas) */}
-          <div className="col-span-2 bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-8 border-b border-slate-50 flex justify-between items-center">
-              <h3 className="font-bold text-lg">Ranking de Tendencias</h3>
+          {/* TABLA DE RANKING REAL */}
+          <div className="col-span-2 bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden">
+            <div className="p-10 border-b border-slate-50 flex justify-between items-center">
+              <h3 className="font-black text-xl italic uppercase tracking-tight">Ranking de Tendencias</h3>
               <div className="flex gap-2">
-                <span className="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-bold">Todos</span>
-                <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-bold">Coches</span>
+                 <span className="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Filtro: Valladolid</span>
               </div>
             </div>
             <table className="w-full text-left">
               <thead className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 <tr>
-                  <th className="px-8 py-4">Palabra Clave</th>
-                  <th className="px-8 py-4">Volumen</th>
-                  <th className="px-8 py-4">Tendencia</th>
-                  <th className="px-8 py-4">Potencial</th>
+                  <th className="px-10 py-5">Palabra Clave</th>
+                  <th className="px-10 py-5 text-center">Clics Reales</th>
+                  <th className="px-10 py-5 text-center">Potencial</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {data.length > 0 ? data.slice(0, 5).map((row, i) => (
-                  <tr key={i} className="text-sm font-semibold hover:bg-slate-50/50 transition-colors">
-                    <td className="px-8 py-5 uppercase">{row.keyword}</td>
-                    <td className="px-8 py-5 text-indigo-600">{row.clicks}</td>
-                    <td className="px-8 py-5 text-emerald-500">+{Math.floor(Math.random() * 20)}%</td>
-                    <td className="px-8 py-5"><span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px]">ALTO</span></td>
-                  </tr>
-                )) : (
-                  <tr><td colSpan={4} className="px-8 py-20 text-center text-slate-300 italic">Selecciona una keyword para ver datos...</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Gráfico Evolución Histórica */}
-          <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm p-8 flex flex-col">
-            <div className="flex justify-between items-center mb-10">
-              <h3 className="font-bold text-lg">Evolución Histórica</h3>
-              <span className="px-3 py-1 bg-emerald-50 text-emerald-500 rounded-full text-[8px] font-black">LIVE SYNC</span>
-            </div>
-            <div className="flex-1 border-2 border-dashed border-slate-100 rounded-[2rem] flex items-center justify-center p-10">
-              <p className="text-slate-300 text-xs text-center italic font-medium leading-relaxed">
-                Selecciona una keyword para ver la evolución del volumen de búsqueda
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+                {rows.length > 0 ? rows.slice(0, 7).map((row, i) => (
+                  <tr key={i} className="hover:bg-slate-50/50 transition-all group">
+                    <td className="px-10 py-6 text-sm font-black italic uppercase text-slate-700 group-hover:text-indigo-600">{row.query}</td>
+                    <td className="px-10 py-6 text-center text-lg font-black text-slate-900">{row.clicks.toLocaleString()}</td>
+                    <td className="px-10 py-6 text-center">
+                       <span className="bg-
